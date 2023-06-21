@@ -1,0 +1,26 @@
+name: Studio Clock
+type: sw.application
+joinable: false
+description: >-
+  This is a simple skeleton NodeJS server that works on any of the devices supported by balena. It also serves as a boilerplate project for you to get started on building your fleet. Have fun! 
+post-provisioning: >-
+  ## Usage instructions
+
+  Allow a few minutes for your device to download the app. Once it's completed, 
+  the welcome page should be accessible on the public device URL.
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: 'https://github.com/Mediaworks-Engineering/rpi-studio-clock'
+  logo:
+    type: blob.asset
+    data:
+      url: 'https://github.com/Mediaworks-Engineering/rpi-studio-clock/tree/main/StudioDisplay_files/MW-logo.png'
+data:
+  supportedDeviceTypes:
+    - generic-x86-64-ext
+    - generic-aarch64
+    - fincm3
+    - beaglebone-black
+    - jetson-tx2

@@ -1,0 +1,189 @@
+<!-- Hacked togeather by Bradley Hamilton 2021-->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Studio Clock</title>
+
+  <link rel="stylesheet" href="./StudioDisplay_files/font-awesome.min.css">
+  <!-- base font (sans-serif: Titillium Web, Lato, Exo 2, Montserrat, Poppins, Noto Sans) -->
+  <link href="./StudioDisplay_files/css" rel="stylesheet">
+ 
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{--dark-text-color:rgba(0,0,0,0.99);--bright-text-color:rgba(255,255,255,0.99);font-family:'Titillium Web',sans-serif;font-weight:600;font-size:4.0vmin;line-height:1.45}h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:700}small{font-weight:600;font-size:75%}table,tr,td{font-size:100%;font-weight:600;padding-right:1em}
+.large-symbol{font-size:200%}
+.xlarge-symbol{font-size:300%}
+.large-text{font-size:145%}
+.grid{display:grid;width:100vw;height:100vh;padding:2vmin;grid-template-columns:4fr 2fr;grid-template-rows:1fr 1fr 1fr 1fr;grid-gap:2vmin}
+.box{border:1px solid rgba(0,0,0,0.15);border-radius:1vmin;background-color:rgba(255,255,255,0.15);padding:1vmin;overflow:hidden}
+.clock{grid-row:1 / 5;grid-column:1}
+.clock div{display:block;text-align:center;vertical-align:middle}#canvas{width:100%;height:100%}
+.boxLogo{grid-row:1;grid-column:2;display:flex;align-items:center;justify-content:center}
+.boxDate{grid-row:2;grid-column:2;display:flex;align-items:center;justify-content:center;font-size: 5.0vmin;}
+.boxTimer{grid-row:3;grid-column:2;grid-template-columns:8fr 92fr;padding:0;display:flex;align-items:center;justify-content:center;font-size: 5.0vmin;}
+.truncate{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.boxTimer-info-progress{z-index:9;padding:0;width:0;height:0;border-radius:0 1vmin 1vmin 0;position:absolute;background-color:hsla(120,25%,50%,0.5)}
+.i{grid-row:4;grid-column:2;text-align:center;font-weight:bold;font-size:8.0vmin}
+.i>*{opacity:.25}.i.on>*{opacity:1}.i.blink>*{opacity:1}
+.i.flash>*{opacity:1}
+.i-onair{;display: flex;align-items: center;justify-content: center;--on-color:hsla(0,90%,50%,0.9);--off-color:hsla(0,25%,50%,0.5);background-color:var(--off-color)}
+.i-onair.on{background-color:var(--on-color)r;}.i-onair.blink{animation:blink 2s infinite}
+.i-onair.flash{animation:flash 2s infinite}
+html{height:100%;transition:background-image 1s ease-in-out;-webkit-transition:color 1s ease;-moz-transition:color 1s ease;-o-transition:color 1s ease;transition:color 1s ease;-webkit-transition:background 1s ease;-moz-transition:background 1s ease;-o-transition:background 1s ease;transition:background 1s ease;background-image:url('images/night.jpg');//set by function setLighting(); background-repeat:no-repeat;background-attachment:fixed;background-size:cover;background-position:center center;background-color:#000;color:rgba(255,255,255,0.99)}
+</style>
+
+  <!script src="./StudioDisplay_files/config-ini.min.js.download" type="text/javascript"></script>
+  <script src="./StudioDisplay_files/studiodisplay.min.js.download" type="text/javascript"></script>
+  <script src="./StudioDisplay_files/clock.min.js.download" type="text/javascript"></script>
+
+<script type="text/javascript"> 
+
+function display_c(){
+var refresh=1000; // Refresh rate in milli seconds
+mytime=setTimeout('display_cd()',refresh)
+}
+
+function display_cd() {
+var x = new Date()
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+var curWeekDay = days[x.getDay()];
+var curMonth = months[x.getMonth()];
+
+var dt=x.getDate().toString();
+
+var x1=dt + " " + curMonth ; 
+document.getElementById('cd').innerHTML = x1;
+document.getElementById('cday').innerHTML = curWeekDay;
+display_c();
+ }
+
+//Define vars to hold time values
+let timers = 0;
+let timerm = 0;
+let timerh = 0;
+
+//Define vars to hold "display" value
+let displaySeconds = 0;
+let displayMinutes = 0;
+let displayHours = 0;
+
+//Define var to hold setInterval() function
+let interval = null;
+
+//Define var to hold stopwatch status
+let status = "stopped";
+
+//Stopwatch function (logic to determine when to increment next value, etc.)
+function stopWatch(){
+
+    timers++;
+
+    //Logic to determine when to increment next value
+    if(timers / 60 === 1){
+        timers = 0;
+        timerm++;
+
+        if(timerm / 60 === 1){
+            timerm = 0;
+            timerh++;
+        }
+
+    }
+
+    //If seconds/minutes/hours are only one digit, add a leading 0 to the value
+    if(timers < 10){displaySeconds = "0" + timers.toString();}
+    else{displaySeconds = timers;}
+
+    if(timerm < 10){ displayMinutes = "0" + timerm.toString();}
+    else{displayMinutes = timerm;}
+
+    if(timerh < 10){displayHours = "0" + timerh.toString();}
+    else{displayHours = timerh;}
+
+    //Display updated time values to user
+    if(timerh < 1){document.getElementById("display").innerHTML = displayMinutes + ":" + displaySeconds;}
+    else {document.getElementById("display").innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;}
+
+}
+
+function startTimer(){
+
+    if(status === "stopped"){
+        //Start the stopwatch (by calling the setInterval() function)
+        interval = window.setInterval(stopWatch, 1000);
+        document.getElementById("display").innerHTML = "00:00";
+        document.getElementById("studio/status/red").style.backgroundColor = "var(--on-color)";
+        document.getElementById("onairtext").style.opacity = ".99";
+        status = "started";
+     }
+}
+function stopTimer(){
+    if(status === "started"){
+        window.clearInterval(interval);
+        timers = 0;
+        timerm = 0;
+        timerh = 0;
+        displaySeconds = 0;
+        displayMinutes = 0;
+        displayHours = 0;
+        document.getElementById("studio/status/red").style.backgroundColor = "var(--off-color)";
+	document.getElementById("onairtext").style.opacity = ".25";
+        status = "stopped";
+     }
+
+}
+
+document.onkeypress = function(e) {
+    if (e.keyCode == 32) {
+           e.preventDefault();
+           startTimer();
+    }
+    if (e.keyCode == 13) {
+           e.preventDefault();
+           stopTimer();
+    }
+};
+
+
+
+
+</script>
+
+</head>
+<body onload=display_cd(); style = "cursor: none";>
+
+
+<span id="cclock"></span></h2>
+  <div class="grid">
+    <div class="box clock">
+      <canvas id="canvas" width="1614" height="1164"></canvas>     
+    </div><div class="box boxLogo">
+    <style>
+     img{
+        max-width: 100%;
+        max-height: 100%;
+     </style>
+     <img src="./StudioDisplay_files/Today-logo.png" >
+    </div>
+    <div class="box boxDate">  
+      <div>
+	<h2><span id="cday" style="display: flex; align-items: center; justify-content: center;"></span>
+        <span id="cd"></span></h2>
+	
+      </div>
+    </div>
+    <div class="box boxTimer">
+      
+      <div class="boxTimer-info">
+        
+        <div class="boxTimer-info-content">
+          <h1 id="display">00:00</h1>
+
+        </div>
+      </div>
+    </div>
+    <div id="studio/status/red" class="box i i-onair"><h2 id="onairtext" class="i18n";>ON AIR</h2></div> 
+  </div>
+</body></html>
